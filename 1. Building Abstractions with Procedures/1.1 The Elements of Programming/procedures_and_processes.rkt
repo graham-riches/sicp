@@ -193,3 +193,11 @@
     )
 )
 
+;-----------------------------------------------------------------------------------------------------
+; Exercise 1.13
+
+#|
+    completed by hand in notebook. Hint: use the definition Fib(n) = Fib(n-1) + Fib(n - 2)
+    then do some substitutions to get a form where you can swap in the provided definitions for phi.
+|#
+
