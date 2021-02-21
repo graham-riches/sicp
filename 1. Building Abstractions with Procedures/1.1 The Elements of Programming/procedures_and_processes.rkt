@@ -100,7 +100,96 @@
 
     f(n) = 2n
     g(n) = 2^n
-    h(n) = 2 ^ (2 ^ n)
+    h(n) = 2 ^ (2 ^ ... n - 1 times)
 |#
 
-(h 5)
+(h 3)
+(h 4)
+
+;-----------------------------------------------------------------------------------------------------
+; Coin Change (this is a project euler problem I need to finish anyways :P)
+; Still have a very hard time seeing how to come up with a solution like this! It's quite a challenge
+(define (count-change amount)
+    (cc amount 8))
+
+(define (cc amount kinds-of-coins)
+    (cond ((= amount 0) 1)
+          ((< amount 0) 0)
+          ((= kinds-of-coins 0) 0)
+          (else (+ (cc amount 
+                        (- kinds-of-coins 1))
+                   (cc (- amount (first-denomination kinds-of-coins))
+                       kinds-of-coins)
+          ))
+    )
+)
+
+(define (first-denomination kinds-of-coins)
+    (cond ((= kinds-of-coins 1) 1)
+          ((= kinds-of-coins 2) 2)
+          ((= kinds-of-coins 3) 5)
+          ((= kinds-of-coins 4) 10)
+          ((= kinds-of-coins 5) 20)
+          ((= kinds-of-coins 6) 50)
+          ((= kinds-of-coins 7) 100)
+          ((= kinds-of-coins 8) 200)
+    )
+)
+
+;-----------------------------------------------------------------------------------------------------
+; Exercise 1.11
+
+(define (f_recursive n)
+    (cond ((< n 3) n)
+          (else (+ 
+                    (f_recursive (- n 1)) 
+                    (* 2 (f_recursive (- n 2))) 
+                    (* 3 (f_recursive (- n 3)))
+                ))
+    )
+)
+
+(define (f_iter n)
+    (define (f a b c count)
+        (cond ((< n 3) n)
+              ((<= count 0) a)
+              (else (f (+ a (* 2 b) (* 3 c)) a b (- count 1)))))
+    (f 2 1 0 (- n 2)))
+
+#|
+    (f_iter 3)
+    (f 2 1 0 1)
+    (f 4 2 1 0)
+    4
+
+    (f_iter 5)
+    (f 2 1 0 3)
+    (f 4 2 1 2)
+    (f 11 4 2 1)
+    (f 25 11 4 0)
+    25
+|#
+
+;-----------------------------------------------------------------------------------------------------
+; Exercise 1.12
+
+#|
+    1
+   1 1
+  1 2 1
+ 1 3 3 1 
+1 4 6 4 1
+|#
+
+
+(define (pascals row column)
+    (cond ((= 0 row) 0)
+          ((< column 0) 0)
+          ((> column row) 0)  
+          ((= row column) 1)
+          ((= column 1) 1)
+          (else (+ (pascals (- row 1)(- column 1))
+                   (pascals (- row 1) column)))
+    )
+)
+
