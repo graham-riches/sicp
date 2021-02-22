@@ -201,3 +201,42 @@
     then do some substitutions to get a form where you can swap in the provided definitions for phi.
 |#
 
+;-----------------------------------------------------------------------------------------------------
+; Exercise 1.14 - tree for count change problem. NOTE: solution above uses extra coins than the book
+;                 NOTE: it is also beneficial to switch the order of the coins around in the denom.
+
+#|
+    ended up doing this in a notebook
+
+    Spacial Complexity - same as maximum depth of the tree which occurs when changing the amount
+                         using only pennies -> O(n)
+
+    Time Complexity - O(n^T) where T is the number of types of coins. This makes sense because each
+                      coin type always ends up with a subtree with the penny change tree in the end
+                      which means it has to be O(n^T)
+|#
+
+;-----------------------------------------------------------------------------------------------------
+; Exercise 1.15 - sin approximation
+
+#|
+    (sine 12.15)
+    (p (sine 4.05))
+    (p (p (sine 1.35)))
+    (p (p (p (sine 0.45))))
+    (p (p (p (p (sine 0.15)))))
+    (p (p (p (p (p (sine 0.05))))))
+
+    a) procedure p is applied 5 times
+
+    b) 
+        a/(3^n) < 0.1
+        a / 0.1 < 3^n
+        10a < 3^n
+        log(a) + log(10) < n log(3)
+        log(a) + 1 < n log(3)
+        (log(a) + 1)/log(3) < n
+        
+        -> log(a) order is logarithmic
+|#
+
