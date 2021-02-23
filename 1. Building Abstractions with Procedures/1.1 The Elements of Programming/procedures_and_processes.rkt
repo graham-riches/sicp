@@ -240,3 +240,73 @@
         -> log(a) order is logarithmic
 |#
 
+;-----------------------------------------------------------------------------------------------------
+; Exercise 1.16 -> iterative successive squaring
+
+#|
+    invariant a goes:
+    a -> b^2 -> b^(2*...n)
+|#
+
+(define (even? a)
+    (= (remainder a 2) 0))
+
+(define (square a)
+    (* a a))
+
+(define (pow base power)
+    (define (pow-iter n b a)
+        (cond ((= n 0) a)
+              ((even? n) (pow-iter (/ n 2) (square b) a))
+              (else (pow-iter (- n 1) b (* b a)))))
+    (pow-iter power base 1)
+)
+
+
+;-----------------------------------------------------------------------------------------------------
+; Exercise 1.17 -> logarithmic multiplication from addition
+(define (double n)
+    (* n 2))
+
+; Note: this assumes n is even ***
+(define (halve n)
+    (/ n 2))
+
+(define (multiply a b)
+    (cond ((= b 1) a)
+          ((even? b) (multiply (double a) (halve b)))
+          (else (+ a (multiply a (- b 1))))))
+
+;-----------------------------------------------------------------------------------------------------
+; Exercise 1.18 -> logarithmic multiplication from addition in an iterative approach
+
+(define (iter_multiply a b)
+    (define (iter a b acc)
+        (cond ((= b 0) acc)
+              ((even? b) (iter (double a) (halve b) acc))
+              (else (iter a (- b 1) (+ acc a)))        
+        )
+    )
+    (iter a b 0)
+)
+
+;-----------------------------------------------------------------------------------------------------
+; Exercise 1.19 -> logarithmic fibonacci
+
+(define (fib n)
+    (define (fib-iter a b p q count)
+        (cond ((= count 0) b)
+              ((even? count)
+                (fib-iter
+                    a
+                    b
+                    (+ (* p p) (* q q))
+                    (+ (* q q) (* 2 p q))
+                    (/ count 2)))
+              (else (fib-iter (+ (* b q) (* a q) (* a p))
+                              (+ (* b p) (* a q))
+                              p
+                              q
+                              (- count 1)))))
+    (fib-iter 1 0 0 1 n))
+
