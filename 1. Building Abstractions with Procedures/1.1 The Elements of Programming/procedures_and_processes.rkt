@@ -310,3 +310,81 @@
                               (- count 1)))))
     (fib-iter 1 0 0 1 n))
 
+;-----------------------------------------------------------------------------------------------------
+; Exercise 1.20 -> greatest common divisors
+
+(define (gcd a b)
+    (if (= b 0)
+        a
+        (gcd b (remainder a b))))
+
+
+#|
+    Normal Order - Fully Expand and Reduce
+    (gcd 206 40)
+    (if (= 40 0))
+    (gcd 40 (remainder 206 40))
+    (if (= 6 0))
+    (gcd (remainder 206 40) (remainder 40 (remainder 206 40)))
+    (if (= (remainder 40 (remainder 206 40)) 0))
+    (if (= 4 0))
+    ... --> this continues and totally blows up
+    From online: 18 remainder invokations
+
+    Applicative Order - Reduce First
+    (gcd 206 40)    
+    (gcd 40 (remainder 206 40))
+    (gcd 40 6)
+    (gcd 6 (remainder 40 6))
+    (gcd 6 4)
+    (gcd 4 (remainder 6 4))
+    (gcd 4 2)
+    (gcd 2 (remainder 4 2))
+
+    only performs 4 invokations of remainder
+|#
+
+
+;-----------------------------------------------------------------------------------------------------
+; Exercise 1.21-> smallest divisors
+
+(define (smallest_divisor n)
+    (find_divisor n 2))
+
+(define (find_divisor n test_divisor)
+    (cond ((> (square test_divisor) n) n)
+          ((divides? test_divisor n) test_divisor)
+          (else (find_divisor n (+ test_divisor 1)))))
+
+(define (divides? a b)
+    (= (remainder b a) 0))
+
+(smallest_divisor 199)
+(smallest_divisor 1999)
+(smallest_divisor 19999)
+
+#|
+    a -> 199
+    b -> 1999
+    c -> 7
+|#
+
+;-----------------------------------------------------------------------------------------------------
+; Exercise 1.22 -> factors
+
+(define (timed_prime_test n)
+    (newline)
+    (display n)
+    (start_prime_test n (current-seconds)))
+
+(define (start_prime_test n start_time)
+    (if (prime? n)
+        (report_prime (- (current-seconds) start_time))
+        (display "")))
+
+(define (report_prime elapsed_time)
+    (display " *** ")
+    (display elapsed_time))
+
+(define (prime? n)
+    (= n (smallest_divisor n)))
