@@ -370,16 +370,16 @@
 |#
 
 ;-----------------------------------------------------------------------------------------------------
-; Exercise 1.22 -> factors
+; Exercise 1.22 -> timed prime factors
 
 (define (timed_prime_test n)
     (newline)
     (display n)
-    (start_prime_test n (current-seconds)))
+    (start_prime_test n (current-inexact-milliseconds)))
 
 (define (start_prime_test n start_time)
     (if (prime? n)
-        (report_prime (- (current-seconds) start_time))
+        (report_prime (- (current-inexact-milliseconds) start_time))
         (display "")))
 
 (define (report_prime elapsed_time)
@@ -388,3 +388,42 @@
 
 (define (prime? n)
     (= n (smallest_divisor n)))
+
+(define (search-for-primes start end count)
+    (define (prime-search number found start-time)
+        (cond ((= found count) (display (- (current-inexact-milliseconds) start-time)))
+              ((= number end) (display "range exceeded"))
+              (else (if (prime? number) 
+                        (begin 
+                            (display "Prime Found: ")
+                            (display number)
+                            (display "\n")
+                            (prime-search (+ number 1) (+ found 1) start-time))
+                        (prime-search (+ number 1) found start-time)
+              ))
+        )
+    
+    
+    )
+    (prime-search start 0 (current-inexact-milliseconds))
+)
+
+#|
+    Results:
+
+    a) first three primes larger than 1000 -> 1009, 1013, 1019
+                                      time_ms: ~8
+    
+    b) first three primes larger than 10000 -> 10007, 10009, 10037
+                                           time_ms ~8.4
+   
+    c) first three primes larger than 100000 -> 100003, 100019, 100043
+                                      time_ms: ~8
+
+    d) first three primes larger than 1000000 -> 1000003, 1000033, 1000037
+                                      time_ms: ~10.5 ms
+
+    Pretty sure the computer at this point in time is just way to fast for testing primes at this
+    order of magnitude. Especially with the inexact nature of the timing functions. Probably need to 
+    increase the order of magnitude substantially to see a difference :)
+|#
