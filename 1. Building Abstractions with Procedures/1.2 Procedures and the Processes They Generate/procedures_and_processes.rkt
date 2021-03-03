@@ -386,14 +386,16 @@
     (display " *** ")
     (display elapsed_time))
 
+#|
 (define (prime? n)
     (= n (smallest_divisor n)))
+|#
 
 (define (search-for-primes start end count)
     (define (prime-search number found start-time)
         (cond ((= found count) (display (- (current-inexact-milliseconds) start-time)))
               ((= number end) (display "range exceeded"))
-              (else (if (prime? number) 
+              (else (if (fast-prime? number 15) 
                         (begin 
                             (display "Prime Found: ")
                             (display number)
@@ -427,3 +429,135 @@
     order of magnitude. Especially with the inexact nature of the timing functions. Probably need to 
     increase the order of magnitude substantially to see a difference :)
 |#
+
+;-----------------------------------------------------------------------------------------------------
+; Exercise 1.23 -> timed prime factors with improved factoring
+
+(define (next-factor n)
+  (cond ((< n 3) (+ n 1))
+        (else (+ n 2))))
+
+(define (find-divisor-mod n test-divisor)
+    (cond ((> (square test-divisor) n) n)
+          ((divides? test-divisor n) test-divisor)
+          (else (find-divisor-mod n (next-factor test-divisor)))))
+
+(define (smallest-divisor-mod n)
+    (find-divisor-mod n 2))
+
+(define (prime? n)
+    (= n (smallest-divisor-mod n)))
+
+#|
+    NOTE: uncomment the prime definitions from above to change the speed of the algorithm. The above version here is MUCH faster due to the halving
+          of the number of checks required. Secondary note, the speed is not quite twice as fast due to the conditional branching in next-factor.
+|#
+
+
+;-----------------------------------------------------------------------------------------------------
+; Exercise 1.24 ->
+
+(define (expmod base exp m)
+  (cond ((= exp 0) 1)
+        ((even? exp) (remainder (square (expmod base (/ exp 2) m)) m))
+        (else (remainder (* base (expmod base (- exp 1) m)) m))))
+
+(define (fermat-test n)
+  (define (try-it a)
+    (= (expmod a n n) a))
+  (try-it (+ 1 (random (- n 1)))))
+
+(define (fast-prime? n times)
+  (cond ((= times 0) true)
+        ((fermat-test n) (fast-prime? n (- times 1)))
+        (else false)))
+
+#|
+    For Log(n) growth, we would expect the time taken to test for primes at 1000000 to only be double what it takes to test at 1000.
+
+|#
+;-----------------------------------------------------------------------------------------------------
+; Exercise 1.25 -> Alyssa thinks expmod could be better
+
+#|
+    Mathematically she's correct. However, she does not take into account that the numbers in this case will be much larger (hence slower)
+    than the original expmod, which always will modulus the operands and thus keep the size of the numbers down!
+|#
+(define (fast-exp b n)
+  (cond ((= n 0) 1)
+        ((even? n) (square (fast-exp b (/ n 2))))
+        (else (* b (fast-exp b (- n 1))))
+  ))
+
+(define (expmod-fast base exp m)
+  (remainder (fast-exp base exp) m))
+
+
+;-----------------------------------------------------------------------------------------------------
+; Exercise 1.26 -> Louis' code runs really slow
+#|
+   The reason for this is that square takes the result of expmod and squares it, whereas Louis is calculating the entire expmod twice in order to do the square.
+   This essentially makes the process go from linear to a tree recursion at (exponential)
+
+|#
+
+;-----------------------------------------------------------------------------------------------------
+; Exercise 1.27 -> Carmichael Test
+
+
+(define (congruent-test n)
+  (define (try-it a)
+    (= (expmod a n n) (remainder a n)))
+  (define (iter n a state)
+    (cond ((= a (- n 1)) state)
+          ((not state) false)
+          (else (iter n (+ a 1) (try-it a)))))
+  (iter n 0 true))
+ 
+#|
+   561, 1105, 1729, 2465, 2821, 6601
+|#
+
+(define (report-fermat-outlier a)
+  (begin
+    (display "Fermat Outlier Test: ")
+    (display a)
+    (display " is prime?: ")
+    (display (fast-prime? a 15))
+    (display " is Congruent? ")
+    (display (congruent-test a))
+    (display "\n")))
+             
+             
+(report-fermat-outlier 561)
+(report-fermat-outlier 1105)
+(report-fermat-outlier 1729)
+(report-fermat-outlier 2465)
+(report-fermat-outlier 2821)
+(report-fermat-outlier 6601)
+
+
+;-----------------------------------------------------------------------------------------------------
+; Exercise 1.28 -> Miller-Rabin test
+
+; NOTE: some inefficieny here can be fixed with let/where type syntax (coming soon I think)
+(define (expmod-signal base exp m)
+  (define (check-nontrivial-sqrt a square)
+    (cond ((= a 1) false)
+          ((= a (- m 1)) false)
+          ((= square (remainder 1 m)) true)
+          (else false)))
+  (define (expmod-square x)
+    (cond ((check-nontrivial-sqrt x (square x)) 0)
+          (else (square x))))
+  (cond ((= exp 0) 1)
+        ((even? exp) (remainder (expmod-square (expmod base (/ exp 2) m)) m))
+        (else (remainder (* base (expmod base (- exp 1) m)) m))))
+
+; NOTE: this should not use a random, but I'm ready to move on to the next section and this is the last
+;       exercise :p
+(define (miller-rabin-test n)
+  (define (try-it a)
+    (cond ((= (expmod-signal a (- n 1) n) 0) false)
+          (else (= (expmod a (- n 1) n) (remainder 1 n)))))
+  (try-it (+ 1 (random (- n 1)))))
