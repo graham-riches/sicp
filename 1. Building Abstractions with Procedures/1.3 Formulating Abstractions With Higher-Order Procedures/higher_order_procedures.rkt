@@ -61,3 +61,19 @@
 
 (sum-cube-linear 1 10)
 
+;-----------------------------------------------------------------------------------------------------
+; Exercise 1.31 -> product --> NOTE: not doing the recursive part because it's a copy paste
+
+(define (product term a next b)
+  (define (iter a result)
+    (if (> a b)
+        result
+        (iter (next a) (* result (term a)))))
+  (iter (next a) (term a)))
+
+(define (identity x) x)
+
+(define (factorial b)
+  (product identity 1 inc b))
+
+(factorial 5)
