@@ -45,3 +45,19 @@
 (simpson-integral cube 0 1 100)
 (simpson-integral cube 0 1 1000)
 ; NOTE: without the 3.0, the integrals are rationals :D
+
+;-----------------------------------------------------------------------------------------------------
+; Exercise 1.30 -> linear iterative sum
+
+(define (sum-linear term a next b)
+  (define (iter a result)
+    (if (> a b)
+        result
+        (iter (next a) (+ result (term a)))))
+  (iter (next a) (term a)))
+
+(define (sum-cube-linear a b)
+  (sum-linear cube a inc b))
+
+(sum-cube-linear 1 10)
+
