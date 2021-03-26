@@ -106,3 +106,20 @@
   (accumulate-recursive + 0 term a next b))
 
 (new-sum-recursive identity 1 inc 5)  ; should print 15
+
+;-----------------------------------------------------------------------------------------------------
+; Exercise 1.33 -> filtered accumulate
+(define (filtered-accumulate combiner predicate null-value term a next b)
+  (define (get-value a)
+    (if (predicate (term a)) (term a)
+        null-value))
+  (define (iter a result)
+  (if (> a b)
+      result
+      (iter (next a) (combiner result (get-value a)))))
+  (iter (next a) null-value))
+
+(define (sum-even a b)
+  (filtered-accumulate + even? 0 identity a inc b))
+
+(sum-even 1 10)
