@@ -77,3 +77,32 @@
   (product identity 1 inc b))
 
 (factorial 5)
+
+;-----------------------------------------------------------------------------------------------------
+; Exercise 1.32 -> accumulate
+
+; Linear iterative version
+(define (accumulate combiner null-value term a next b)
+  (define (iter a result)
+  (if (> a b)
+      result
+      (iter (next a) (combiner result (term a)))))
+  (iter (next a) null-value))
+
+
+(define (new-sum term a next b)
+  (accumulate + 0 term a next b))
+
+(define (new-product term a next b)
+  (accumulate * 1 term a next b))
+
+; Recursive version
+; [1 2 3 4 5]
+(define (accumulate-recursive combiner null-value term a next b)
+  (if (> a b) null-value
+      (combiner (term a) (accumulate-recursive combiner null-value term (next a) next b))))
+
+(define (new-sum-recursive term a next b)
+  (accumulate-recursive + 0 term a next b))
+
+(new-sum-recursive identity 1 inc 5)  ; should print 15
