@@ -247,7 +247,7 @@
 (guess-euler 10)
 
 ;-----------------------------------------------------------------------------------------------------
-; Exercise 1.39 - continued fraction to tan
+; Exercise 1.39 - continued fraction approximation to tan
 ; Note: needed a bit of a hack to remap the cont-frac to use a subtraction, could be abstracted better
 
 (header "exercise - 1.39")
@@ -268,3 +268,107 @@
    k))
 
 (tan-cf (/ 3.1415926 4) 15)  ; should be 1.0 ish :)
+
+
+;-----------------------------------------------------------------------------------------------------
+; Exercise 1.40 - newtons method approximation
+(header "exercise - 1.40")
+
+(define dx 0.00001)
+
+(define (derivative g)
+  (lambda (x)
+    (/ (- (g (+ x dx)) (g x)) dx)))
+
+(define (newton-transform g)
+  (lambda (x) (- x (/ (g x) ((derivative g) x)))))
+
+(define (newtons-method g guess)
+  (fixed-point (newton-transform g) guess))
+
+(define (newton-sqrt x)
+  (newtons-method (lambda (y) (- (square y) x)) 1.0))
+
+(newton-sqrt 2)
+
+(define (cubic a b c)
+  (lambda (x) (+ (cube x) (* a (square x)) (* b x)  c)))
+
+(newtons-method (cubic 1 2 3) 1)
+
+;-----------------------------------------------------------------------------------------------------
+; Exercise 1.41 - more on higher order procedures
+(header "exercise - 1.41")
+
+(define (double f)
+  (lambda (x) (f (f x))))
+
+((double inc) 1)
+
+(((double (double double)) inc) 5)
+
+; expanding this: +2 -> 2*2 = 4 -> 4*4 = 16: 16 + 5 = 21
+
+;-----------------------------------------------------------------------------------------------------
+; Exercise 1.42 - function composition
+(header "exercise - 1.42")
+
+(define (compose f g)
+  (lambda (x) (f (g x))))
+
+((compose square inc) 6)
+
+;-----------------------------------------------------------------------------------------------------
+; Exercise 1.43 - repeated function application
+(header "exercise - 1.43")
+
+(define (repeated f n)
+  (define (iter function term)
+    (cond ((= term 1) function)
+          (else (iter (lambda (x) (f (function x))) (- term 1)))))
+  (iter f n))
+
+((repeated inc 5) 5)
+((repeated square 2) 5)
+
+;-----------------------------------------------------------------------------------------------------
+; Exercise 1.44 - smoothing function
+
+(header "exercise - 1.44")
+
+(define (smooth f)
+  (lambda (x) (/ (+ (f (+ x dx)) (f x) (f (- x dx))) 3.0)))
+
+(define (smooth-n n)
+  (repeated smooth n))
+
+;-----------------------------------------------------------------------------------------------------
+; Exercise 1.45 - fixed point approximations with average damping experimental
+
+; For now, I'm going to skip this exercise as it has not a huge amount of extra value over what's
+; already been covered in this chapter and will take a massive amount of time!
+
+;-----------------------------------------------------------------------------------------------------
+; Exercise 1.46 - higher order iterative improve
+
+(header "exercise - 1.46")
+(define (iterative-improve good-enough? improve)
+  (lambda (guess) (if (good-enough? guess) guess
+                      ((iterative-improve good-enough? improve) (improve guess)))))
+
+(define (iterative-sqrt x)
+  ((iterative-improve (lambda (y) (< (abs (- (square y) x)) 0.001))
+                        (lambda (guess) (average guess (/ x guess)))) 1.0))
+
+(iterative-sqrt 2)
+
+(define (close-enough? v1 v2)
+    (< (abs (- v1 v2)) tolerance))
+
+(define (iterative-fixed-point f first-guess)
+  ((iterative-improve
+    (lambda (x) (close-enough? x (f x)))
+    f)
+   first-guess))
+
+ (iterative-fixed-point cos 1.0)
