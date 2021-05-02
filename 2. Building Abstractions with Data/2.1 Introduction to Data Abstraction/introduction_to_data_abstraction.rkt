@@ -45,7 +45,7 @@
                (avg (y-point (start-segment s)) (y-point (end-segment s)))))
 
 ;-----------------------------------------------------------------------------------------------------
-; Exercise 2.3 -> Rectangls and Squares
+; Exercise 2.3 -> Rectangles and Squares
 
 (define (make-rectangle p1 length width)
   (define (make-dimensions l w) (cons l w))
@@ -67,3 +67,58 @@
 
 (define (make-square p1 size)
   (make-rectangle p1 size size))
+
+;-----------------------------------------------------------------------------------------------------
+; Exercise 2.4 -> Alternative Representation of Pairs
+(define (cons x y)
+  (lambda (m) (m x y)))
+
+(define (car z)
+  (z (lambda (p q) p)))
+
+(define (cdr z)
+  (z (lambda (p q) q)))
+
+
+(define (validate-pair-construction p expected)
+  (cond ((= (car p) expected) #t)
+        (else #f)))
+                            
+(validate-pair-construction (cons 1 2) 1)
+
+
+;-----------------------------------------------------------------------------------------------------
+; Exercise 2.5 -> Pairs of Non-Negative Numbers as a Combined Integer
+(define (power base exp)
+  (define (power-recursive tally count)
+    (cond ((= exp count) tally)
+          (else (power-recursive (* tally base) (+ count 1)))))
+  (cond ((= exp 0) 1)
+        (else (power-recursive base 1))))
+
+; note: the following assumes that base is a Nth power of root
+(define (get-exponent base root)
+  (define (get-exp value count)
+    (cond ((= value root) count)
+          (else (get-exp (/ value root) (+ count 1)))))
+  (get-exp base 1))
+
+
+(define (cons-int a b)
+  (* (power 2 a) (power 3 b)))
+
+(define (car-int p)
+  (define (car-fact value count)
+    (cond ((= 0 (remainder value 2)) (car-fact (/ value 2) (+ count 1)))
+          (else (- count 1))))
+  (car-fact p 1))
+
+(define (cdr-int p)
+  (define (car-fact value count)
+    (cond ((= 0 (remainder value 3)) (car-fact (/ value 3) (+ count 1)))
+          (else (- count 1))))
+  (car-fact p 1))
+  
+;-----------------------------------------------------------------------------------------------------
+; Exercise 2.6 -> Pairs of Non-Negative Numbers as a Combined Integer
+
