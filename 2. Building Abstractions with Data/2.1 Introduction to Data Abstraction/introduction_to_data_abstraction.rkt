@@ -122,3 +122,27 @@
 ;-----------------------------------------------------------------------------------------------------
 ; Exercise 2.6 -> Pairs of Non-Negative Numbers as a Combined Integer
 
+(define zero (lambda (f) (lambda (x) x)))
+(define (add-1 n)
+  (lambda (f) (lambda (x) (f ((n f) x)))))
+
+; evaluate via substitution (add-1 zero)
+; (lambda (f) (lambda (x) (f ((zero f) x))))) --> ((zero f) x) == x
+; (lambda (f) (lambda (x) (f x)))
+
+; evaluate via substitution (add-1 one)
+; (lambda (f) (lambda (x) (f ((one f) x)))))
+; (lambda (f) (lambda (x) (f (((lambda (a) (lambda (b) (a b))) f) x)))) --> note repeated pattern of lambda (x) (f x)
+; (lambda (f) (lambda (x) (f ((lambda (b) (f b)) x))))
+; (lambda (f) (lambda (x) (f (f x))))
+
+; addition is multiple applications of the nested lamdba as many times as required:
+; i.e. three is -> (lambda (f) (lambda (x) (f (f (f x)))))
+
+(define (add a b)
+  (lambda (f) (lambda (x) ((a f) ((b f) x)))))
+
+
+
+
+
