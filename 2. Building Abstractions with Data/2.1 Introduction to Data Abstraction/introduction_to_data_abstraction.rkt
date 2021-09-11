@@ -143,6 +143,52 @@
   (lambda (f) (lambda (x) ((a f) ((b f) x)))))
 
 
+;-----------------------------------------------------------------------------------------------------
+; Exercise 2.7-2.11 Interval Arithmetic
+
+(define (make-interval a b) (cons a b))
+
+(define (lower-bound i) (car i))
+(define (upper-bound i) (cdr i))
+
+
+(define (add-interval x y)
+  (make-interval (+ (lower-bound x) (lower-bound y))
+                 (+ (upper-bound x) (upper-bound y))))
+
+(define (mul-interval x y)
+  (let ((p1 (* (lower-bound x) (lower-bound y)))
+        (p2 (* (lower-bound x) (upper-bound y)))
+        (p3 (* (upper-bound x) (lower-bound y)))
+        (p4 (* (upper-bound x) (upper-bound y))))
+    (make-interval (min p1 p2 p3 p4)
+                   (max p1 p2 p3 p4))))
+
+(define (div-interval x y)
+  (mul-interval x
+                (make-interval (/ 1.0 (upper-bound y))
+                               (/ 1.0 (lower-bound y)))))
+
+
+(define (sub-interval x y)
+  (if (<= 0 (* (lower-bound y) (upper-bound y)))
+      (error "ERROR: division intervals spans 0" y)      
+      (make-interval (- (lower-bound x) (upper-bound y)) (- (upper-bound x) (lower-bound y)))))
+
+(define (width i )
+  (/ (- (upper-bound i) (lower-bound i)) 2))
+
+; Note: for addition and subtraction, the final width is the sum of the two widths - (+ (width x) (width y))
+; this cannot be the case for multiplication and subtraction because the width does not correspond to the values:
+; i.e. (div-interval (make-interval 1 2) (make-interval 3 4)) -> p1 = 1 * (1/3), p2 = 1 * (1/4), p3 = 2 * (1/3), p4 = 2 * (1/4)
+; [0.33, 0.25, 0.66, 0.5] -> [0.25 0.66] -> witdh = 0.41
+; now using a different set but with the same width (/i (5 6) (7 8)) -> [5/7, 5/8, 6/7, 6/8] -> [40/56 35/56 48/56 42/56] -> [35/56 48/56] -> width = 13/102 ~0.1 something
+; therefore it cannot be a function of only the width!
+
+; ex 2.11
+  
+
+
 
 
 
