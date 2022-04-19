@@ -186,7 +186,12 @@
 ; therefore it cannot be a function of only the width!
 
 ; ex 2.11
-  
+(define (make-interval a b)
+  (if (< a b)
+      (cons a b)
+      (cons b a)))
+
+
 
 
 
