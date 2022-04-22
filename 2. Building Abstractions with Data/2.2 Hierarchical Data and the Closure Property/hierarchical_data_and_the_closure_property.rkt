@@ -158,4 +158,99 @@
 
 ;--------------------------------------------------------------
 ; Ex. 2.27
+(define x27 (list (list 1 2) (list 3 4)))
 
+(define (deep-reverse items)
+  (if (pair? items)
+      (append (deep-reverse (cdr items)) (list (deep-reverse (car items))))
+      items))
+
+(deep-reverse x27)
+
+;--------------------------------------------------------------
+; Ex. 2.28
+(define x28 (list (list 1 2) (list 3 4)))
+
+; Note: this is just flatten
+(define (fringe tree)
+  (if (null? tree)
+      tree
+      (let ((head (car tree))
+            (tail (cdr tree)))
+        (if (not (pair? head))
+            (cons head (fringe tail))
+            (append (fringe head) (fringe tail))))))
+
+(fringe x28)
+
+;--------------------------------------------------------------
+; Ex. 2.29
+(define (make-mobile left right)
+  (list left right))
+
+(define (make-branch length structure)
+  (list length structure))
+
+(define (left-branch mobile)
+  (car mobile))
+
+(define (right-branch mobile)
+  (car (cdr mobile)))
+
+(define (branch-length branch)
+  (car branch))
+
+(define (branch-structure branch)
+  (car (cdr branch)))
+
+(define (total-weight mobile)
+  (cond ((null? mobile) 0)
+        ((not (pair? mobile)) mobile)
+        (else (+ (total-weight (branch-structure (left-branch mobile)))
+                 (total-weight (branch-structure (right-branch mobile)))))))
+
+(define tr (make-mobile (make-branch 1 10) (make-branch 1 15)))
+(total-weight tr)
+
+
+(define (torque branch)
+  (* (branch-length branch) (total-weight (branch-structure branch))))
+
+(define (balanced? mobile)
+  (if (not (pair? mobile))
+      true
+      (and (= (torque (left-branch mobile)) (torque (right-branch mobile)))
+           (balanced? (branch-structure (left-branch mobile)))
+           (balanced? (branch-structure (right-branch mobile))))))
+
+;--------------------------------------------------------------
+; Ex. 2.30
+(define (square-tree-1 tree)
+  (cond ((null? tree) null)
+        ((not (pair? tree)) (* tree tree))
+        (else (cons (square-tree-1 (car tree)) (square-tree-1 (cdr tree))))))
+
+(define x30 (list 1 (list 2 (list 3 4) 5) (list 6 7)))
+(square-tree-1 x30)
+
+; Higher order map for trees
+(define (tree-map proc tree)
+  (cond ((null? tree) null)
+        ((not (pair? tree)) (proc tree))
+        (else (cons (tree-map proc (car tree)) (tree-map proc (cdr tree))))))
+
+(tree-map (lambda (x) (* x x)) x30)
+
+;--------------------------------------------------------------
+; Ex. 2.31
+; Already done in 2.30 because abstraction is great :D
+
+;--------------------------------------------------------------
+; Ex. 2.32
+(define (subsets s)
+  (if (null? s)
+      (list `())
+      (let ((rest (subsets (cdr s))))
+        (append rest (map (lambda (x) (cons (car s) x)) rest)))))
+
+(subsets (list 1 2 3 ))
